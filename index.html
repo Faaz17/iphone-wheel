@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone Lucky Wheel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 30px auto;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            border: 4px solid #fff;
+        }
+
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .segment-text {
+            transform: skewY(45deg) rotate(22.5deg);
+            text-align: center;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            padding: 10px;
+        }
+
+        .iphone-icon {
+            font-size: 2rem;
+            margin-bottom: 4px;
+            display: block;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .text-label {
+            font-size: 0.9rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        /* iPhone segments - bright colors */
+        .segment:nth-child(1) { 
+            background: linear-gradient(135deg, #ff6b6b, #ff5252); 
+            transform: rotate(0deg) skewY(-45deg); 
+        }
+        .segment:nth-child(3) { 
+            background: linear-gradient(135deg, #4ecdc4, #26c6da); 
+            transform: rotate(90deg) skewY(-45deg); 
+        }
+        .segment:nth-child(5) { 
+            background: linear-gradient(135deg, #feca57, #ffca28); 
+            transform: rotate(180deg) skewY(-45deg); 
+        }
+        .segment:nth-child(7) { 
+            background: linear-gradient(135deg, #ff9ff3, #e91e63); 
+            transform: rotate(270deg) skewY(-45deg); 
+        }
+
+        /* Try Again segments - gray tones */
+        .segment:nth-child(2) { 
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d); 
+            transform: rotate(45deg) skewY(-45deg); 
+        }
+        .segment:nth-child(4) { 
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6); 
+            transform: rotate(135deg) skewY(-45deg); 
+        }
+        .segment:nth-child(6) { 
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d); 
+            transform: rotate(225deg) skewY(-45deg); 
+        }
+        .segment:nth-child(8) { 
+            background: linear-gradient(135deg, #bdc3c7, #95a5a6); 
+            transform: rotate(315deg) skewY(-45deg); 
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #333;
+            z-index: 10;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .center-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: 3px solid white;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .center-button:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .center-button:disabled {
+            background: linear-gradient(45deg, #ccc, #999);
+            cursor: not-allowed;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .winner {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            animation: bounce 0.6s ease;
+            border: 3px solid #ffa000;
+        }
+
+        .try-again {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: 3px solid #ff5252;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            animation: confetti-fall 3s linear infinite;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            0% { 
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .spin-count {
+            margin-top: 25px;
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #2ed573, #7bed9f);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 213, 115, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .wheel-container {
+                width: 320px;
+                height: 320px;
+            }
+            .title { 
+                font-size: 2.2rem; 
+            }
+            .container { 
+                padding: 25px; 
+            }
+            .center-button { 
+                width: 65px; 
+                height: 65px; 
+                font-size: 0.9rem; 
+            }
+            .iphone-icon {
+                font-size: 1.6rem;
+            }
+            .text-label {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .wheel-container {
+                width: 280px;
+                height: 280px;
+            }
+            .iphone-icon {
+                font-size: 1.4rem;
+            }
+            .text-label {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🎰 SPIN TO WIN</h1>
+        <p class="subtitle">Spin the wheel for a chance to win an iPhone 15 Pro! 📱</p>
+        
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <!-- iPhone Segment 1 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">📱</span>
+                        <span class="text-label">iPhone</span>
+                    </div>
+                </div>
+                
+                <!-- Try Again Segment 1 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">😔</span>
+                        <span class="text-label">Try Again</span>
+                    </div>
+                </div>
+                
+                <!-- iPhone Segment 2 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">📱</span>
+                        <span class="text-label">iPhone</span>
+                    </div>
+                </div>
+                
+                <!-- Try Again Segment 2 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">😔</span>
+                        <span class="text-label">Try Again</span>
+                    </div>
+                </div>
+                
+                <!-- iPhone Segment 3 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">📱</span>
+                        <span class="text-label">iPhone</span>
+                    </div>
+                </div>
+                
+                <!-- Try Again Segment 3 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">😔</span>
+                        <span class="text-label">Try Again</span>
+                    </div>
+                </div>
+                
+                <!-- iPhone Segment 4 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">📱</span>
+                        <span class="text-label">iPhone</span>
+                    </div>
+                </div>
+                
+                <!-- Try Again Segment 4 -->
+                <div class="segment">
+                    <div class="segment-text">
+                        <span class="iphone-icon">😔</span>
+                        <span class="text-label">Try Again</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="center-button" id="centerBtn" onclick="spinWheel()">
+                <span id="spinBtn">SPIN</span>
+            </button>
+        </div>
+
+        <div id="result" class="result"></div>
+        
+        <div class="spin-count">
+            Spins: <span id="spinCount">0</span>
+        </div>
+        
+        <button class="reset-btn" onclick="resetGame()">🔄 Reset Game</button>
+    </div>
+
+    <script>
+        var isSpinning = false;
+        var spinCount = 0;
+        var totalRotation = 0;
+
+        var segments = [
+            { text: 'iPhone', type: 'win', icon: '📱' },
+            { text: 'Try Again', type: 'lose', icon: '😔' },
+            { text: 'iPhone', type: 'win', icon: '📱' },
+            { text: 'Try Again', type: 'lose', icon: '😔' },
+            { text: 'iPhone', type: 'win', icon: '📱' },
+            { text: 'Try Again', type: 'lose', icon: '😔' },
+            { text: 'iPhone', type: 'win', icon: '📱' },
+            { text: 'Try Again', type: 'lose', icon: '😔' }
+        ];
+
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            spinCount++;
+            updateSpinCount();
+            
+            var spinBtn = document.getElementById('spinBtn');
+            var centerBtn = document.getElementById('centerBtn');
+            
+            spinBtn.textContent = '...';
+            centerBtn.disabled = true;
+            
+            // Hide previous result
+            var resultDiv = document.getElementById('result');
+            resultDiv.classList.remove('show');
+            
+            // Calculate random spin
+            var minSpins = 5;
+            var maxSpins = 8;
+            var spins = minSpins + Math.random() * (maxSpins - minSpins);
+            var finalAngle = Math.random() * 360;
+            var totalDegrees = spins * 360 + finalAngle;
+            
+            totalRotation += totalDegrees;
+            
+            var wheel = document.getElementById('wheel');
+            wheel.style.transform = 'rotate(' + totalRotation + 'deg)';
+            
+            // Determine result
+            setTimeout(function() {
+                var normalizedAngle = (360 - (totalRotation % 360)) % 360;
+                var segmentAngle = 360 / segments.length;
+                var segmentIndex = Math.floor(normalizedAngle / segmentAngle);
+                var result = segments[segmentIndex];
+                
+                showResult(result);
+                
+                // Re-enable button
+                setTimeout(function() {
+                    isSpinning = false;
+                    spinBtn.textContent = 'SPIN';
+                    centerBtn.disabled = false;
+                }, 1000);
+                
+            }, 4000);
+        }
+
+        function showResult(result) {
+            var resultDiv = document.getElementById('result');
+            
+            if (result.type === 'win') {
+                resultDiv.innerHTML = '<div class="winner">' +
+                    '🎉 CONGRATULATIONS! 🎉<br>' +
+                    'You won an iPhone 15 Pro!<br>' +
+                    '<small>* This is a demo - no actual prize will be awarded</small>' +
+                    '</div>';
+                createConfetti();
+            } else {
+                resultDiv.innerHTML = '<div class="try-again">' +
+                    '😔 Better luck next time!<br>' +
+                    'Spin again for another chance!' +
+                    '</div>';
+            }
+            
+            setTimeout(function() {
+                resultDiv.classList.add('show');
+            }, 500);
+        }
+
+        function createConfetti() {
+            var colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#ffd700'];
+            
+            for (var i = 0; i < 50; i++) {
+                setTimeout(function() {
+                    var confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(function() {
+                        if (confetti && confetti.parentNode) {
+                            confetti.parentNode.removeChild(confetti);
+                        }
+                    }, 3500);
+                }, i * 20);
+            }
+        }
+
+        function updateSpinCount() {
+            document.getElementById('spinCount').textContent = spinCount;
+        }
+
+        function resetGame() {
+            if (isSpinning) return;
+            
+            spinCount = 0;
+            totalRotation = 0;
+            updateSpinCount();
+            document.getElementById('wheel').style.transform = 'rotate(0deg)';
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('result').innerHTML = '';
+        }
+
+        // Initialize
+        updateSpinCount();
+    </script>
+</body>
+</html>
